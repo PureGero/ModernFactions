@@ -1,0 +1,11 @@
+factions:
+
+  # The price to create a faction
+  faction-create-price: 0
+
+  # The number of free claims someone has before they need to pay for them
+  free-claims: 2
+
+  # The price of claims (after someone uses up all their free claims)
+  # Set to 0 for infinite free claims
+  claim-price: 0
