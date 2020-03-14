@@ -1,3 +1,8 @@
 name: ModernFactions
 main: com.modernfactions.ModernFactions
 version: 0.0.1
+api-version: 1.15
+commands:
+  testrandomteleport:
+    description: Test the random teleport functionality
+    default: op

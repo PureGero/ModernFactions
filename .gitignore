@@ -9,4 +9,5 @@ eclipse
 
 build
 .gradle
+out
 
