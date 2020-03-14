@@ -14,6 +14,7 @@ public class MFCommandManager {
 
     private void registerCommands() {
         plugin.getServer().getPluginCommand("testrandomteleport").setExecutor(new TestRandomTeleport());
+        plugin.getServer().getPluginCommand("modernfactions").setExecutor(new ModernFactionsCommand());
     }
 
 }

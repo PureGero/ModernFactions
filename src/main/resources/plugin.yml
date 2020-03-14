@@ -6,3 +6,7 @@ commands:
   testrandomteleport:
     description: Test the random teleport functionality
     default: op
+  modernfactions:
+    description: Modern Factions commands
+    default: true;
+    aliases: [f, mf, factions]

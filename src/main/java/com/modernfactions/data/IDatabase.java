@@ -1,4 +1,16 @@
 package com.modernfactions.data;
 
+import java.sql.SQLException;
+import java.util.UUID;
+
 public interface IDatabase {
+
+    void setFactionName(UUID fuuid, String name) throws SQLException;
+
+    String getFactionName(UUID fuuid) throws SQLException;
+
+    void addFactionMember(UUID fuuid, UUID uuid) throws SQLException;
+
+    void setFactionMemberRole(UUID fuuid, UUID uuid, int role) throws SQLException;
+
 }

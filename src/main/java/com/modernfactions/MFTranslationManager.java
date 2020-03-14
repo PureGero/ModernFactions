@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.xml.soap.Text;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -114,6 +115,15 @@ public class MFTranslationManager {
     private BaseComponent[] getMessage(MFTranslation translation, String name, Object[] args) {
         if (translation.get(name) != null) {
             // Get from translation file
+
+            for (int i = 0; i < args.length; i++) {
+                if (args[i] instanceof BaseComponent) {
+                    args[i] = TextComponent.toPlainText((BaseComponent) args[i]);
+                } else if (args[i] instanceof BaseComponent[]) {
+                    args[i] = TextComponent.toPlainText((BaseComponent[]) args[i]);
+                }
+            }
+
             return TextComponent.fromLegacyText(String.format(translation.get(name), args));
 
         } else if (translation == english) {
@@ -139,7 +149,7 @@ public class MFTranslationManager {
     public String getLanguageName(CommandSender sender) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            return player.getLocale();
+            return player.getLocale().toLowerCase();
         } else {
             return null;
         }

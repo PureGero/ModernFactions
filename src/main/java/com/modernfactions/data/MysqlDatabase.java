@@ -2,10 +2,8 @@ package com.modernfactions.data;
 
 import com.modernfactions.ModernFactions;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.UUID;
 
 public class MysqlDatabase implements IDatabase {
     private static final String tables =
@@ -16,7 +14,7 @@ public class MysqlDatabase implements IDatabase {
             "CREATE TABLE IF NOT EXISTS faction_members (\n" +
                     "uuid CHAR(36) PRIMARY KEY,\n" +
                     "fuuid CHAR(36) NOT NULL,\n" +
-                    "role INT NOT NULL DEFAULT 0\n" +
+                    "role TINYINT NOT NULL DEFAULT 0\n" +
             ");\n" +
             "CREATE TABLE IF NOT EXISTS faction_claims (\n" +
                     "fuuid CHAR(36),\n" +
@@ -54,6 +52,24 @@ public class MysqlDatabase implements IDatabase {
         }
     }
 
+    private PreparedStatement preparedStatement(String sql, Object... args) throws SQLException {
+        PreparedStatement statement = connect().prepareStatement(sql);
+
+        for (int i = 0; i < args.length; i++) {
+            statement.setObject(i + 1, args[i]);
+        }
+
+        return statement;
+    }
+
+    private boolean execute(String sql, Object... args) throws SQLException {
+        return preparedStatement(sql, args).execute();
+    }
+
+    private ResultSet executeQuery(String sql, Object... args) throws SQLException {
+        return preparedStatement(sql, args).executeQuery();
+    }
+
     private void setupTables() {
         for (String table : tables.split(";")) {
             if (table.length() == 0) {
@@ -66,5 +82,54 @@ public class MysqlDatabase implements IDatabase {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void setFactionName(UUID fuuid, String name) throws SQLException {
+        execute(
+                "INSERT INTO faction_names (fuuid, name) VALUES (?, ?)\n" +
+                        "ON DUPLICATE KEY UPDATE name = ?",
+                fuuid.toString(),
+                name,
+                name
+        );
+    }
+
+    @Override
+    public String getFactionName(UUID fuuid) throws SQLException {
+        ResultSet set = executeQuery(
+                "SELECT name FROM faction_names WHERE fuuid = ?",
+                fuuid.toString()
+        );
+
+        if (set.next()) {
+            return set.getString("name");
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void addFactionMember(UUID fuuid, UUID uuid) throws SQLException {
+        execute(
+                "INSERT INTO faction_members (fuuid, uuid) VALUES (?, ?)\n" +
+                        "ON DUPLICATE KEY UPDATE fuuid = ?",
+                fuuid.toString(),
+                uuid.toString(),
+                fuuid.toString()
+        );
+    }
+
+    @Override
+    public void setFactionMemberRole(UUID fuuid, UUID uuid, int role) throws SQLException {
+        execute(
+                "INSERT INTO faction_members (fuuid, uuid, role) VALUES (?, ?, ?)\n" +
+                        "ON DUPLICATE KEY UPDATE fuuid = ?, role = ?",
+                fuuid.toString(),
+                uuid.toString(),
+                role,
+                fuuid.toString(),
+                role
+        );
     }
 }
