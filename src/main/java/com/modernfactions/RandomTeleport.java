@@ -1,7 +1,6 @@
 package com.modernfactions;
 
 import org.bukkit.*;
-import org.bukkit.entity.Player;
 
 /**
  * Randomly teleport a player to somewhere in the world

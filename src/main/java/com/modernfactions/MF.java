@@ -1,7 +1,6 @@
 package com.modernfactions;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class MF {
 

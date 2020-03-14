@@ -1,6 +1,7 @@
 package com.modernfactions;
 
 import com.modernfactions.commands.MFCommandManager;
+import com.modernfactions.data.MFDatabaseManager;
 import com.modernfactions.listener.MFListenerManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,6 +29,7 @@ public final class ModernFactions extends JavaPlugin {
         new MFTranslationManager(this);
         new MFCommandManager(this);
         new MFListenerManager(this);
+        new MFDatabaseManager(this);
 
     }
 }

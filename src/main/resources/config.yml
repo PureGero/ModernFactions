@@ -9,3 +9,21 @@ factions:
   # The price of claims (after someone uses up all their free claims)
   # Set to 0 for infinite free claims
   claim-price: 0
+
+  # MySQL database details
+  mysql:
+
+    # The MySQL host
+    host: "localhost"
+
+    # The MySQL port
+    port: 3306
+
+    # The MySQL database
+    db: "factions"
+
+    # Your MySQL user's name
+    user: "root"
+
+    # Your MySQL user's password
+    password: ""
