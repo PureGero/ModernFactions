@@ -31,23 +31,26 @@ public class ModernFactionsCommand implements CommandExecutor {
 
                 return true;
             } catch (NoSuchMethodException e) {
-                help(sender, label, args);
+
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 sender.spigot().sendMessage(new ComponentBuilder()
                         .append(MF.getMessage(sender, "command.failed"))
                         .color(ChatColor.RED).create());
+                return false;
             }
         }
+
+        help(sender, label, args);
 
         return false;
     }
 
     public void help(CommandSender sender, String label, String[] args) {
         ComponentBuilder builder = new ComponentBuilder();
-        builder.append(" # --- ===   ").color(ChatColor.BLUE);
+        builder.append(" # --- ===    ").color(ChatColor.BLUE);
         builder.append(MF.getMessage(sender, "help")).color(ChatColor.AQUA);
-        builder.append("   === --- # ").color(ChatColor.BLUE);
+        builder.append("    === --- # ").color(ChatColor.BLUE);
         builder.append("\n");
 
         builder.append(MF.getMessage(sender, "command.create.usage", label)).color(ChatColor.AQUA);

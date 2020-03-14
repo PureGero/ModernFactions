@@ -13,4 +13,6 @@ public interface IDatabase {
 
     void setFactionMemberRole(UUID fuuid, UUID uuid, int role) throws SQLException;
 
+    String getFactionNameFromMember(UUID uuid) throws SQLException;
+
 }

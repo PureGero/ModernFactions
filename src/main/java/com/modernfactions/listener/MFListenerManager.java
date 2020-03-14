@@ -14,5 +14,6 @@ public class MFListenerManager {
 
     private void registerListener() {
         plugin.getServer().getPluginManager().registerEvents(new RandomTeleportListener(), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new ChatListener(), plugin);
     }
 }

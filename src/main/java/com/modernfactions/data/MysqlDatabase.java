@@ -132,4 +132,19 @@ public class MysqlDatabase implements IDatabase {
                 role
         );
     }
+
+    @Override
+    public String getFactionNameFromMember(UUID uuid) throws SQLException {
+        ResultSet set = executeQuery(
+                "SELECT name FROM faction_names, faction_members\n" +
+                "WHERE faction_names.fuuid = faction_members.fuuid AND uuid = ?",
+                uuid.toString()
+        );
+
+        if (set.next()) {
+            return set.getString("name");
+        } else {
+            return null;
+        }
+    }
 }
