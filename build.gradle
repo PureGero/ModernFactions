@@ -14,6 +14,9 @@ repositories {
   maven {
     url "https://oss.sonatype.org/content/repositories/snapshots/"
   }
+  maven {
+    url "https://jitpack.io"
+  }
 }
 
 version = "0.1"
@@ -30,6 +33,7 @@ configurations {
 dependencies {
   //compileOnly "org.bukkit:bukkit:$bukkit_version"
   compileOnly "org.spigotmc:spigot-api:$bukkit_version"
+  compileOnly "com.github.MilkBowl:VaultAPI:1.7"
 }
 
 jar {

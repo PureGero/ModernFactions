@@ -2,6 +2,7 @@ name: ModernFactions
 main: com.modernfactions.ModernFactions
 version: 0.0.1
 api-version: 1.15
+softdepend: [Vault]
 commands:
   testrandomteleport:
     description: Test the random teleport functionality
@@ -10,3 +11,7 @@ commands:
     description: Modern Factions commands
     default: true;
     aliases: [f, mf, factions]
+  refer:
+    description: Refer a player
+    default: true
+    aliases: [referral]

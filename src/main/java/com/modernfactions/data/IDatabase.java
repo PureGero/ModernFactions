@@ -15,4 +15,8 @@ public interface IDatabase {
 
     String getFactionNameFromMember(UUID uuid) throws SQLException;
 
+    boolean hasReferredAPlayer(UUID uuid) throws SQLException;
+
+    void referAPlayer(UUID uuid, UUID to) throws SQLException;
+
 }

@@ -9,6 +9,7 @@ public final class ModernFactions extends JavaPlugin {
 
     private static ModernFactions modernFactions;
     private static MFConfig config;
+    private static MFEconomyManager economy;
 
     public static ModernFactions get() {
         return modernFactions;
@@ -16,6 +17,10 @@ public final class ModernFactions extends JavaPlugin {
 
     public static MFConfig getMFConfig() {
         return config;
+    }
+
+    public static MFEconomyManager getEconomy() {
+        return economy;
     }
 
     @Override
@@ -30,6 +35,7 @@ public final class ModernFactions extends JavaPlugin {
         new MFCommandManager(this);
         new MFListenerManager(this);
         new MFDatabaseManager(this);
+        economy = new MFEconomyManager(this);
 
     }
 }

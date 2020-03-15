@@ -21,6 +21,10 @@ public class MysqlDatabase implements IDatabase {
                     "wuuid CHAR(36),\n" +
                     "claims INT NOT NULL DEFAULT 0,\n" +
                     "PRIMARY KEY (fuuid, wuuid)\n" +
+            ");\n" +
+            "CREATE TABLE IF NOT EXISTS faction_referrals (\n" +
+                    "uuid CHAR(36) PRIMARY KEY,\n" +
+                    "other_uuid CHAR(36)\n" +
             ")";
 
     private Connection connection = null;
@@ -146,5 +150,28 @@ public class MysqlDatabase implements IDatabase {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public boolean hasReferredAPlayer(UUID uuid) throws SQLException {
+        ResultSet set = executeQuery(
+                "SELECT other_uuid FROM faction_referrals WHERE uuid = ?",
+                uuid.toString()
+        );
+
+        if (set.next()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void referAPlayer(UUID uuid, UUID to) throws SQLException {
+        execute(
+                "INSERT INTO faction_referrals (uuid, other_uuid) VALUES (?, ?)",
+                uuid.toString(),
+                to.toString()
+        );
     }
 }
