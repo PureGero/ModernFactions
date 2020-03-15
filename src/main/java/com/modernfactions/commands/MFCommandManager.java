@@ -16,6 +16,7 @@ public class MFCommandManager {
         plugin.getServer().getPluginCommand("testrandomteleport").setExecutor(new TestRandomTeleport());
         plugin.getServer().getPluginCommand("modernfactions").setExecutor(new ModernFactionsCommand());
         plugin.getServer().getPluginCommand("refer").setExecutor(new ReferCommand());
+        plugin.getServer().getPluginCommand("territory").setExecutor(new TerritoryCommand());
     }
 
 }

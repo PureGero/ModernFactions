@@ -15,3 +15,7 @@ commands:
     description: Refer a player
     default: true
     aliases: [referral]
+  territory:
+    description: A visual view of the claim around you
+    default: true
+    aliases: [terr, claims]
