@@ -10,6 +10,8 @@ public class MFCommandManager {
         this.plugin = plugin;
 
         registerCommands();
+
+        registerTabCompleters();
     }
 
     private void registerCommands() {
@@ -17,6 +19,10 @@ public class MFCommandManager {
         plugin.getServer().getPluginCommand("modernfactions").setExecutor(new ModernFactionsCommand());
         plugin.getServer().getPluginCommand("refer").setExecutor(new ReferCommand());
         plugin.getServer().getPluginCommand("territory").setExecutor(new TerritoryCommand());
+    }
+
+    private void registerTabCompleters() {
+        plugin.getServer().getPluginCommand("modernfactions").setTabCompleter(new ModernFactionsTabCompleter());
     }
 
 }

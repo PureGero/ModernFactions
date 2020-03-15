@@ -24,7 +24,7 @@ public class ModernFactionsCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length > 0) {
             try {
-                Method method = getClass().getMethod(args[0], CommandSender.class, String.class, String[].class);
+                Method method = getClass().getMethod(args[0].toLowerCase(), CommandSender.class, String.class, String[].class);
 
                 String[] newargs = new String[args.length - 1];
                 System.arraycopy(args, 1, newargs, 0, newargs.length);
