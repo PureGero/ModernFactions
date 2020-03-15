@@ -1,8 +1,6 @@
 package com.modernfactions.commands;
 
-import com.modernfactions.Factions;
-import com.modernfactions.MF;
-import com.modernfactions.Roles;
+import com.modernfactions.*;
 import com.modernfactions.data.MFDatabaseManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -10,6 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,9 +33,7 @@ public class ModernFactionsCommand implements CommandExecutor {
 
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
-                sender.spigot().sendMessage(new ComponentBuilder()
-                        .append(MF.getMessage(sender, "command.failed"))
-                        .color(ChatColor.RED).create());
+                MF.sendMessage(sender, ChatColor.RED, "command.failed", e.getMessage());
                 return false;
             }
         }
@@ -56,6 +53,16 @@ public class ModernFactionsCommand implements CommandExecutor {
         builder.append(MF.getMessage(sender, "command.create.usage", label)).color(ChatColor.AQUA);
         builder.append(": ");
         builder.append(MF.getMessage(sender, "command.create.description")).color(ChatColor.BLUE);
+        builder.append("\n");
+
+        builder.append(MF.getMessage(sender, "command.info.usage", label)).color(ChatColor.AQUA);
+        builder.append(": ");
+        builder.append(MF.getMessage(sender, "command.info.description")).color(ChatColor.BLUE);
+        builder.append("\n");
+
+        builder.append(MF.getMessage(sender, "command.claim.usage", label)).color(ChatColor.AQUA);
+        builder.append(": ");
+        builder.append(MF.getMessage(sender, "command.claim.description")).color(ChatColor.BLUE);
         builder.append("\n");
 
         builder.append(" # --- === ").color(ChatColor.BLUE);
@@ -79,20 +86,70 @@ public class ModernFactionsCommand implements CommandExecutor {
                 MFDatabaseManager.getDatabase().setFactionName(newFuuid, name);
                 if (name.equals(MFDatabaseManager.getDatabase().getFactionName(newFuuid))) {
                     MFDatabaseManager.getDatabase().setFactionMemberRole(newFuuid, uuid, Roles.OWNER);
-                    sender.spigot().sendMessage(new ComponentBuilder()
-                            .append(MF.getMessage(sender, "command.create.success", name))
-                            .color(ChatColor.GREEN).create());
+                    MF.sendMessage(sender, ChatColor.GREEN, "command.create.success", name);
                 } else {
-                    sender.spigot().sendMessage(new ComponentBuilder()
-                            .append(MF.getMessage(sender, "command.create.error.alreadyexists", name))
-                            .color(ChatColor.RED).create());
+                    MF.sendMessage(sender, ChatColor.RED, "command.create.error.alreadyexists", name);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                sender.spigot().sendMessage(new ComponentBuilder()
-                        .append(MF.getMessage(sender, "command.error", e.getMessage()))
-                        .color(ChatColor.RED).create());
+                MF.sendMessage(sender, ChatColor.RED, "command.error", e.getMessage());
             }
+        }
+    }
+
+    public void info(CommandSender sender, String label, String[] args) {
+        Player player = (Player) sender;
+        UUID fuuid = MFClaimManager.getClaim(player.getLocation());
+
+        if (fuuid == null) {
+            MF.sendMessage(sender, ChatColor.RED, "command.info.error.nofaction");
+            return;
+        }
+
+        try {
+            MF.sendMessage(sender, ChatColor.GOLD, "command.info.success",
+                    MFDatabaseManager.getDatabase().getFactionName(fuuid),
+                    MFDatabaseManager.getDatabase().getFactionMemberCount(fuuid));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void claim(CommandSender sender, String label, String[] args) {
+        Player player = (Player) sender;
+        UUID claim_fuuid = MFClaimManager.getClaim(player.getLocation());
+
+        try {
+            if (claim_fuuid != null) {
+                MF.sendMessage(sender, ChatColor.RED, "command.claim.error.alreadyclaimed",
+                        MFDatabaseManager.getDatabase().getFactionName(claim_fuuid));
+                return;
+            }
+
+            UUID fuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
+
+            if (fuuid == null) {
+                MF.sendMessage(sender, ChatColor.RED, "command.claim.error.notinfaction");
+                return;
+            }
+
+            int claimsCounts = MFDatabaseManager.getDatabase().getFactionClaims(fuuid);
+
+            if (claimsCounts >= ModernFactions.getMFConfig().getNumberOfFreeClaims() &&
+                    !ModernFactions.getEconomy().takeMoney(player.getUniqueId(), ModernFactions.getMFConfig().getClaimPrice())) {
+                // takeMoney send the error message
+                return;
+            }
+
+            MFDatabaseManager.getDatabase().increaseBy1FactionClaim(fuuid, player.getWorld().getUID());
+            MFClaimManager.setClaim(player.getLocation(), fuuid);
+
+            MF.sendMessage(sender, ChatColor.GOLD, "command.claim.success",
+                    player.getLocation().getBlockX() >> 4 << 4,
+                    player.getLocation().getBlockZ() >> 4 << 4,
+                    MFDatabaseManager.getDatabase().getFactionName(fuuid));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

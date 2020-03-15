@@ -2,6 +2,7 @@ package com.modernfactions.commands;
 
 import com.modernfactions.MF;
 import com.modernfactions.RandomTeleport;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,18 +24,18 @@ public class TestRandomTeleport implements CommandExecutor {
             target = Bukkit.getPlayer(args[0]);
 
             if (target == null) {
-                MF.sendMessage(sender, "argument.entity.notfound.player");
+                MF.sendMessage(sender, ChatColor.RED, "argument.entity.notfound.player");
                 return false;
             }
 
         } else if (target == null) {
 
-            MF.sendMessage(sender, "permissions.requires.player");
+            MF.sendMessage(sender, ChatColor.RED, "permissions.requires.player");
             return false;
 
         }
 
-        MF.sendMessage(sender, "random.teleport.success", target.getName());
+        MF.sendMessage(sender, ChatColor.GREEN, "random.teleport.success", target.getName());
 
         target.teleport(RandomTeleport.getRandomTeleportLocation());
 

@@ -174,4 +174,56 @@ public class MysqlDatabase implements IDatabase {
                 to.toString()
         );
     }
+
+    @Override
+    public int getFactionClaims(UUID fuuid) throws SQLException {
+        ResultSet set = executeQuery(
+                "SELECT SUM(claims) AS claims_total FROM faction_claims WHERE fuuid = ?",
+                fuuid.toString()
+        );
+
+        if (set.next()) {
+            return set.getInt("claims_total");
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public void increaseBy1FactionClaim(UUID fuuid, UUID wuuid) throws SQLException {
+        execute(
+                "INSERT INTO faction_claims (fuuid, wuuid, claims) VALUES (?, ?, 1)\n" +
+                        "ON DUPLICATE KEY UPDATE claims = claims + 1",
+                fuuid.toString(),
+                wuuid.toString()
+        );
+    }
+
+    @Override
+    public int getFactionMemberCount(UUID fuuid) throws SQLException {
+        ResultSet set = executeQuery(
+                "SELECT COUNT(*) AS member_count FROM faction_members WHERE fuuid = ?",
+                fuuid.toString()
+        );
+
+        if (set.next()) {
+            return set.getInt("member_count");
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public UUID getFaction(UUID uuid) throws SQLException {
+        ResultSet set = executeQuery(
+                "SELECT fuuid FROM faction_members WHERE uuid = ?",
+                uuid.toString()
+        );
+
+        if (set.next()) {
+            return UUID.fromString(set.getString("fuuid"));
+        } else {
+            return null;
+        }
+    }
 }

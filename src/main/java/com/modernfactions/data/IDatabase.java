@@ -19,4 +19,12 @@ public interface IDatabase {
 
     void referAPlayer(UUID uuid, UUID to) throws SQLException;
 
+    int getFactionClaims(UUID fuuid) throws SQLException;
+
+    void increaseBy1FactionClaim(UUID fuuid, UUID wuuid) throws SQLException;
+
+    int getFactionMemberCount(UUID fuuid) throws SQLException;
+
+    UUID getFaction(UUID uuid) throws SQLException;
+
 }

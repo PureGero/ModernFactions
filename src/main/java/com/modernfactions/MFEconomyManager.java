@@ -24,6 +24,10 @@ public class MFEconomyManager {
     }
 
     public void giveMoney(UUID player, double amount) {
+        if (amount == 0) {
+            return;
+        }
+
         economy.depositPlayer(plugin.getServer().getOfflinePlayer(player), amount);
 
         Player onlinePlayer = plugin.getServer().getPlayer(player);
@@ -35,6 +39,10 @@ public class MFEconomyManager {
     }
 
     public boolean takeMoney(UUID player, double amount) {
+        if (amount == 0) {
+            return true;
+        }
+
         EconomyResponse response = economy.withdrawPlayer(plugin.getServer().getOfflinePlayer(player), amount);
 
         Player onlinePlayer = plugin.getServer().getPlayer(player);

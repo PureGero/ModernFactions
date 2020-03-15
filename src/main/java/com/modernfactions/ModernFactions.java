@@ -10,6 +10,7 @@ public final class ModernFactions extends JavaPlugin {
     private static ModernFactions modernFactions;
     private static MFConfig config;
     private static MFEconomyManager economy;
+    private static MFClaimManager claims;
 
     public static ModernFactions get() {
         return modernFactions;
@@ -36,6 +37,15 @@ public final class ModernFactions extends JavaPlugin {
         new MFListenerManager(this);
         new MFDatabaseManager(this);
         economy = new MFEconomyManager(this);
+        claims = new MFClaimManager(this);
+
+    }
+
+    @Override
+    public void onDisable() {
+
+        // Save all the claims
+        claims.run();
 
     }
 }

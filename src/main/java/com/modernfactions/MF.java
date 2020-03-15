@@ -1,6 +1,8 @@
 package com.modernfactions;
 
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.command.CommandSender;
 
 public class MF {
@@ -10,6 +12,13 @@ public class MF {
      */
     public static void sendMessage(CommandSender sender, String name, Object... args) {
         sender.spigot().sendMessage(MFTranslationManager.get().getMessage(sender, name, args));
+    }
+
+    /**
+     * Translate and send a message to a CommandSender with a certain color
+     */
+    public static void sendMessage(CommandSender sender, ChatColor color, String name, Object... args) {
+        sender.spigot().sendMessage(new ComponentBuilder().append(getMessage(sender, name, args)).color(color).create());
     }
 
     /**
