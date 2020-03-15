@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -29,7 +30,13 @@ public class ModernFactionsCommand implements CommandExecutor {
                 String[] newargs = new String[args.length - 1];
                 System.arraycopy(args, 1, newargs, 0, newargs.length);
 
+                // long t = System.currentTimeMillis();
+
                 method.invoke(this, sender, label, newargs);
+
+                // t = (System.currentTimeMillis() - t);
+
+                // sender.sendMessage(String.format("Took %d ms to execute command", t));
 
                 return true;
             } catch (NoSuchMethodException e) {
@@ -95,6 +102,12 @@ public class ModernFactionsCommand implements CommandExecutor {
             UUID newFuuid = UUID.randomUUID();
             UUID uuid = ((Entity) sender).getUniqueId();
             String name = args[0];
+
+            if (name.getBytes(StandardCharsets.UTF_8).length > 16) {
+                MF.sendMessage(sender, ChatColor.RED, "command.create.error.toolong");
+                return;
+            }
+
             try {
                 MFDatabaseManager.getDatabase().setFactionName(newFuuid, name);
                 if (name.equals(MFDatabaseManager.getDatabase().getFactionName(newFuuid))) {
@@ -122,7 +135,8 @@ public class ModernFactionsCommand implements CommandExecutor {
         try {
             MF.sendMessage(sender, ChatColor.GOLD, "command.info.success",
                     MFDatabaseManager.getDatabase().getFactionName(fuuid),
-                    MFDatabaseManager.getDatabase().getFactionMemberCount(fuuid));
+                    MFDatabaseManager.getDatabase().getFactionMemberCount(fuuid),
+                    MFDatabaseManager.getDatabase().getFactionClaims(fuuid));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

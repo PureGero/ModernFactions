@@ -18,7 +18,7 @@ public class MF {
      * Translate and send a message to a CommandSender with a certain color
      */
     public static void sendMessage(CommandSender sender, ChatColor color, String name, Object... args) {
-        sender.spigot().sendMessage(new ComponentBuilder().append(getMessage(sender, name, args)).color(color).create());
+        sender.spigot().sendMessage(getMessage(sender, color, name, args));
     }
 
     /**
@@ -26,5 +26,12 @@ public class MF {
      */
     public static BaseComponent[] getMessage(CommandSender sender, String name, Object... args) {
         return MFTranslationManager.get().getMessage(sender, name, args);
+    }
+
+    /**
+     * Translate a message and give it a color
+     */
+    public static BaseComponent[] getMessage(CommandSender sender, ChatColor color, String name, Object... args) {
+        return new ComponentBuilder().append(getMessage(sender, name, args)).color(color).create();
     }
 }
