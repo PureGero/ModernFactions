@@ -1,9 +1,12 @@
 package com.modernfactions.commands;
 
 import com.modernfactions.*;
+import com.modernfactions.data.BlockPos;
 import com.modernfactions.data.MFDatabaseManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -63,6 +66,16 @@ public class ModernFactionsCommand implements CommandExecutor {
         builder.append(MF.getMessage(sender, "command.claim.usage", label)).color(ChatColor.AQUA);
         builder.append(": ");
         builder.append(MF.getMessage(sender, "command.claim.description")).color(ChatColor.BLUE);
+        builder.append("\n");
+
+        builder.append(MF.getMessage(sender, "command.home.usage", label)).color(ChatColor.AQUA);
+        builder.append(": ");
+        builder.append(MF.getMessage(sender, "command.home.description")).color(ChatColor.BLUE);
+        builder.append("\n");
+
+        builder.append(MF.getMessage(sender, "command.sethome.usage", label)).color(ChatColor.AQUA);
+        builder.append(": ");
+        builder.append(MF.getMessage(sender, "command.sethome.description")).color(ChatColor.BLUE);
         builder.append("\n");
 
         builder.append(" # --- === ").color(ChatColor.BLUE);
@@ -129,7 +142,7 @@ public class ModernFactionsCommand implements CommandExecutor {
             UUID fuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
 
             if (fuuid == null) {
-                MF.sendMessage(sender, ChatColor.RED, "command.claim.error.notinfaction");
+                MF.sendMessage(sender, ChatColor.RED, "command.error.notinfaction");
                 return;
             }
 
@@ -144,10 +157,81 @@ public class ModernFactionsCommand implements CommandExecutor {
             MFDatabaseManager.getDatabase().increaseBy1FactionClaim(fuuid, player.getWorld().getUID());
             MFClaimManager.setClaim(player.getLocation(), fuuid);
 
+            if (claimsCounts == 0) {
+                MFDatabaseManager.getDatabase().setFactionHome(fuuid, player.getLocation());
+            }
+
             MF.sendMessage(sender, ChatColor.GOLD, "command.claim.success",
                     player.getLocation().getBlockX() >> 4 << 4,
                     player.getLocation().getBlockZ() >> 4 << 4,
                     MFDatabaseManager.getDatabase().getFactionName(fuuid));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void home(CommandSender sender, String label, String[] args) {
+        Player player = (Player) sender;
+
+        try {
+            UUID fuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
+
+            if (fuuid == null) {
+                MF.sendMessage(sender, ChatColor.RED, "command.error.notinfaction");
+                return;
+            }
+
+            BlockPos home = MFDatabaseManager.getDatabase().getFactionHome(fuuid);
+
+            if (home == null) {
+                MF.sendMessage(sender, ChatColor.RED, "command.home.error.nohome");
+                return;
+            }
+
+            if (home.toLocation() == null) {
+                // World not on this server
+                MF.sendMessage(sender, ChatColor.RED, "command.error.worldnotfound");
+                return;
+            }
+
+            Block block = home.toLocation().getBlock();
+
+            while (block.getType() != Material.AIR || block.getRelative(0, 1, 0).getType() != Material.AIR) {
+                block = block.getRelative(0, 1, 0);
+            }
+
+            player.teleport(block.getLocation().add(0.5, 0 ,0.5));
+
+            MF.sendMessage(sender, ChatColor.GREEN, "command.home.success");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void sethome(CommandSender sender, String label, String[] args) {
+        Player player = (Player) sender;
+
+        try {
+            UUID fuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
+
+            if (fuuid == null) {
+                MF.sendMessage(sender, ChatColor.RED, "command.error.notinfaction");
+                return;
+            }
+
+            UUID claim_fuuid = MFClaimManager.getClaim(player.getLocation());
+
+            if (!fuuid.equals(claim_fuuid)) {
+                MF.sendMessage(sender, ChatColor.RED, "command.sethome.error.notinmyfaction");
+                return;
+            }
+
+            MFDatabaseManager.getDatabase().setFactionHome(fuuid, player.getLocation());
+
+            MF.sendMessage(sender, ChatColor.GREEN, "command.sethome.success",
+                    player.getLocation().getBlockX(),
+                    player.getLocation().getBlockY(),
+                    player.getLocation().getBlockZ());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

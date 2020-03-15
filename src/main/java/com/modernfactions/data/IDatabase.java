@@ -1,5 +1,7 @@
 package com.modernfactions.data;
 
+import org.bukkit.Location;
+
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -26,5 +28,9 @@ public interface IDatabase {
     int getFactionMemberCount(UUID fuuid) throws SQLException;
 
     UUID getFaction(UUID uuid) throws SQLException;
+
+    BlockPos getFactionHome(UUID fuuid) throws SQLException;
+
+    void setFactionHome(UUID fuuid, Location location) throws SQLException;
 
 }

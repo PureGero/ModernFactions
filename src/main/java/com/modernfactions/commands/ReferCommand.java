@@ -38,9 +38,7 @@ public class ReferCommand implements CommandExecutor {
 
         try {
             if (MFDatabaseManager.getDatabase().hasReferredAPlayer(uuid)) {
-                sender.spigot().sendMessage(new ComponentBuilder().append(
-                        MF.getMessage(sender, "command.refer.error.alreadyreferred")
-                ).color(ChatColor.RED).create());
+                MF.sendMessage(sender, ChatColor.RED, "command.refer.error.alreadyreferred");
                 return false;
             }
 
@@ -49,9 +47,8 @@ public class ReferCommand implements CommandExecutor {
             throw new RuntimeException(e);
         }
 
-        sender.spigot().sendMessage(new ComponentBuilder().append(
-                MF.getMessage(sender, "command.refer.success", target.getName())
-        ).color(ChatColor.GREEN).create());
+        MF.sendMessage(sender, ChatColor.GREEN, "command.refer.success", target.getName());
+        MF.sendMessage(target, ChatColor.GOLD, "command.refer.success.other", sender.getName());
 
         ModernFactions.getEconomy().giveMoney(uuid, 1000);
         ModernFactions.getEconomy().giveMoney(target.getUniqueId(), 1000);

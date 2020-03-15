@@ -1,6 +1,7 @@
 package com.modernfactions.data;
 
 import com.modernfactions.ModernFactions;
+import org.bukkit.Location;
 
 import java.sql.*;
 import java.util.UUID;
@@ -25,6 +26,13 @@ public class MysqlDatabase implements IDatabase {
             "CREATE TABLE IF NOT EXISTS faction_referrals (\n" +
                     "uuid CHAR(36) PRIMARY KEY,\n" +
                     "other_uuid CHAR(36)\n" +
+            ");\n" +
+            "CREATE TABLE IF NOT EXISTS faction_homes (\n" +
+                    "fuuid CHAR(36) PRIMARY KEY,\n" +
+                    "wuuid CHAR(36) NOT NULL,\n" +
+                    "x INT NOT NULL,\n" +
+                    "y INT NOT NULL,\n" +
+                    "z INT NOT NULL\n" +
             ")";
 
     private Connection connection = null;
@@ -225,5 +233,41 @@ public class MysqlDatabase implements IDatabase {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public BlockPos getFactionHome(UUID fuuid) throws SQLException {
+        ResultSet set = executeQuery(
+                "SELECT wuuid, x, y, z FROM faction_homes WHERE fuuid = ?",
+                fuuid.toString()
+        );
+
+        if (set.next()) {
+            return new BlockPos(UUID.fromString(set.getString("wuuid")), set.getInt("x"), set.getInt("y"), set.getInt("z"));
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void setFactionHome(UUID fuuid, Location location) throws SQLException {
+        String wuuid = location.getWorld().getUID().toString();
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
+
+        execute(
+                "INSERT INTO faction_homes (fuuid, wuuid, x, y, z) VALUES (?, ?, ?, ?, ?)\n" +
+                        "ON DUPLICATE KEY UPDATE wuuid = ?, x = ?, y = ?, z = ?",
+                fuuid.toString(),
+                wuuid,
+                x,
+                y,
+                z,
+                wuuid,
+                x,
+                y,
+                z
+        );
     }
 }
