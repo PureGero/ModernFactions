@@ -196,7 +196,7 @@ public class ModernFactionsCommand implements CommandExecutor {
 
             Block block = home.toLocation().getBlock();
 
-            while (block.getType() != Material.AIR || block.getRelative(0, 1, 0).getType() != Material.AIR) {
+            while (!block.getType().isAir() || !block.getRelative(0, 1, 0).getType().isAir()) {
                 block = block.getRelative(0, 1, 0);
             }
 
