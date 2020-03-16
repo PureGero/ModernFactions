@@ -123,6 +123,10 @@ public class ModernFactionsCommand implements CommandExecutor {
         }
     }
 
+    public void i(CommandSender sender, String label, String[] args) {
+        info(sender, label, args);
+    }
+
     public void info(CommandSender sender, String label, String[] args) {
         Player player = (Player) sender;
         UUID fuuid = MFClaimManager.getClaim(player.getLocation());
@@ -182,6 +186,10 @@ public class ModernFactionsCommand implements CommandExecutor {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void h(CommandSender sender, String label, String[] args) {
+        home(sender, label, args);
     }
 
     public void home(CommandSender sender, String label, String[] args) {
