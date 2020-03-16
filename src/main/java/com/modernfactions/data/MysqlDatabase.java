@@ -4,6 +4,8 @@ import com.modernfactions.ModernFactions;
 import org.bukkit.Location;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class MysqlDatabase implements IDatabase {
@@ -33,6 +35,11 @@ public class MysqlDatabase implements IDatabase {
                     "x INT NOT NULL,\n" +
                     "y INT NOT NULL,\n" +
                     "z INT NOT NULL\n" +
+            ");\n" +
+            "CREATE TABLE IF NOT EXISTS faction_allies (\n" +
+                    "fuuid CHAR(36),\n" +
+                    "added_fuuid CHAR(36),\n" +
+                    "PRIMARY KEY (fuuid, added_fuuid)\n" +
             ")";
 
     private Connection connection = null;
@@ -122,6 +129,20 @@ public class MysqlDatabase implements IDatabase {
     }
 
     @Override
+    public UUID getFactionByName(String name) throws SQLException {
+        ResultSet set = executeQuery(
+                "SELECT fuuid FROM faction_names WHERE name LIKE ?",
+                name
+        );
+
+        if (set.next()) {
+            return UUID.fromString(set.getString("fuuid"));
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public void addFactionMember(UUID fuuid, UUID uuid) throws SQLException {
         execute(
                 "INSERT INTO faction_members (fuuid, uuid) VALUES (?, ?)\n" +
@@ -130,6 +151,22 @@ public class MysqlDatabase implements IDatabase {
                 uuid.toString(),
                 fuuid.toString()
         );
+    }
+
+    @Override
+    public List<UUID> getFactionMembers(UUID fuuid) throws SQLException {
+        List<UUID> members = new ArrayList<>();
+
+        ResultSet set = executeQuery(
+                "SELECT uuid FROM faction_members WHERE fuuid = ?",
+                fuuid.toString()
+        );
+
+        while (set.next()) {
+            members.add(UUID.fromString(set.getString("uuid")));
+        }
+
+        return members;
     }
 
     @Override
@@ -268,6 +305,103 @@ public class MysqlDatabase implements IDatabase {
                 x,
                 y,
                 z
+        );
+    }
+
+    @Override
+    public boolean areAllies(UUID fuuid, UUID added_fuuid) throws SQLException {
+        ResultSet set = executeQuery(
+                "SELECT added_fuuid FROM faction_allies WHERE fuuid = ? AND added_fuuid = ?",
+                fuuid.toString(),
+                added_fuuid.toString()
+        );
+
+        if (set.next()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void addAlly(UUID fuuid, UUID added_fuuid) throws SQLException {
+        execute(
+                "INSERT INTO faction_allies (fuuid, added_fuuid) VALUES (?, ?)",
+                fuuid.toString(),
+                added_fuuid.toString()
+        );
+    }
+
+    @Override
+    public List<UUID> getAddedAllies(UUID fuuid) throws SQLException {
+        List<UUID> added_fuuids = new ArrayList<>();
+
+        ResultSet set = executeQuery(
+                "SELECT added_fuuid FROM faction_allies WHERE fuuid = ?",
+                fuuid.toString()
+        );
+
+        while (set.next()) {
+            added_fuuids.add(UUID.fromString(set.getString("added_fuuid")));
+        }
+
+        return added_fuuids;
+    }
+
+    @Override
+    public List<String> getAddedAlliesNames(UUID fuuid) throws SQLException {
+        List<String> added_names = new ArrayList<>();
+
+        ResultSet set = executeQuery(
+                "SELECT name FROM faction_names, faction_allies WHERE faction_names.fuuid = faction_allies.added_fuuid AND faction_allies.fuuid = ?",
+                fuuid.toString()
+        );
+
+        while (set.next()) {
+            added_names.add(set.getString("name"));
+        }
+
+        return added_names;
+    }
+
+    @Override
+    public List<UUID> getAddedMe(UUID added_fuuid) throws SQLException {
+        List<UUID> fuuids = new ArrayList<>();
+
+        ResultSet set = executeQuery(
+                "SELECT fuuid FROM faction_allies WHERE added_fuuid = ?",
+                added_fuuid.toString()
+        );
+
+        while (set.next()) {
+            fuuids.add(UUID.fromString(set.getString("fuuid")));
+        }
+
+        return fuuids;
+    }
+
+    @Override
+    public List<String> getAddedMeNames(UUID added_fuuid) throws SQLException {
+        List<String> added_names = new ArrayList<>();
+
+        ResultSet set = executeQuery(
+                "SELECT name FROM faction_names, faction_allies WHERE faction_names.fuuid = faction_allies.fuuid AND faction_allies.added_fuuid = ?",
+                added_fuuid.toString()
+        );
+
+        while (set.next()) {
+            added_names.add(set.getString("name"));
+        }
+
+        return added_names;
+    }
+
+    @Override
+    public void removeAlly(UUID fuuid, UUID added_fuuid) throws SQLException {
+        execute(
+                "DELETE FROM faction_allies WHERE fuuid = ? AND added_fuuid = ?",
+                fuuid.toString(),
+                added_fuuid.toString()
         );
     }
 }

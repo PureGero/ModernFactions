@@ -15,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 public class TerritoryCommand implements CommandExecutor {
@@ -24,9 +25,10 @@ public class TerritoryCommand implements CommandExecutor {
         Player player = (Player) sender;
         try {
             UUID fuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
+            List<UUID> allies = MFDatabaseManager.getDatabase().getAddedMe(fuuid);
 
             for (int i = 0; i < 32; i++) {
-                TerritoryView view = new TerritoryView(player, i, fuuid);
+                TerritoryView view = new TerritoryView(player, i, fuuid, allies);
                 Bukkit.getScheduler().runTaskLater(ModernFactions.get(), view, i);
                 Bukkit.getScheduler().runTaskLater(ModernFactions.get(), view, 10*20 + i);
             }
@@ -42,13 +44,15 @@ public class TerritoryCommand implements CommandExecutor {
         Player player;
         int radius;
         UUID fuuid;
+        List<UUID> allies;
         boolean show = true;
 
-        public TerritoryView(Player player, int radius, UUID fuuid) {
+        public TerritoryView(Player player, int radius, UUID fuuid, List<UUID> allies) {
             this.center = player.getLocation().getBlock();
             this.player = player;
             this.radius = radius;
             this.fuuid = fuuid;
+            this.allies = allies;
         }
 
         @Override
@@ -83,6 +87,10 @@ public class TerritoryCommand implements CommandExecutor {
 
                 if (claim_fuuid != null) {
                     glass = Material.RED_STAINED_GLASS;
+                }
+
+                if (claim_fuuid != null && allies.contains(claim_fuuid)) {
+                    glass = Material.YELLOW_STAINED_GLASS;
                 }
 
                 if (claim_fuuid != null && claim_fuuid.equals(fuuid)) {

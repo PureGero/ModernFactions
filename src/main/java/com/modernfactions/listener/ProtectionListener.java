@@ -9,19 +9,24 @@ import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.projectiles.ProjectileSource;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 public class ProtectionListener implements Listener {
@@ -54,10 +59,20 @@ public class ProtectionListener implements Listener {
             try {
                 UUID fuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
 
-                if (!claim_fuuid.equals(fuuid)) {
-                    sendAccessDeniedMessage(player, claim_fuuid);
-                    event.setCancelled(true);
+                if (claim_fuuid.equals(fuuid)) {
+                    return;
                 }
+
+                List<UUID> allies = MFDatabaseManager.getDatabase().getAddedMe(fuuid);
+
+                for (UUID ally : allies) {
+                    if (claim_fuuid.equals(ally)) {
+                        return;
+                    }
+                }
+
+                sendAccessDeniedMessage(player, claim_fuuid);
+                event.setCancelled(true);
 
             } catch (SQLException e1) {
                 e1.printStackTrace();
@@ -179,6 +194,25 @@ public class ProtectionListener implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         onBlockModified(e);
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
+        Entity entity = e.getDamager();
+
+        while (entity instanceof Projectile) {
+            ProjectileSource source = ((Projectile) entity).getShooter();
+
+            if (!(source instanceof Entity)) {
+                break;
+            }
+
+            entity = (Entity) source;
+        }
+
+        if (entity instanceof Player) {
+            onLocationModified(e, (Player) entity, e.getEntity().getLocation());
+        }
     }
 
     @EventHandler
