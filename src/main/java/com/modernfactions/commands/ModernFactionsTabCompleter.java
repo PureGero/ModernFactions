@@ -1,6 +1,7 @@
 package com.modernfactions.commands;
 
 import com.modernfactions.data.MFDatabaseManager;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -70,6 +71,40 @@ public class ModernFactionsTabCompleter implements TabCompleter {
                 for (String ally : allies) {
                     if (ally.toLowerCase().startsWith(args[0].toLowerCase())) {
                         tab.add(ally);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void ally(CommandSender sender, String alias, String[] args, List<String> tab) {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+
+        UUID uuid = ((Player) sender).getUniqueId();
+
+        if (args.length == 1) {
+            try {
+                UUID fuuid = MFDatabaseManager.getDatabase().getFaction(uuid);
+
+                if (fuuid == null) {
+                    return;
+                }
+
+                List<UUID> allies = MFDatabaseManager.getDatabase().getAddedAllies(fuuid);
+
+                for (Player other_player : Bukkit.getOnlinePlayers()) {
+                    UUID other_fuuid = MFDatabaseManager.getDatabase().getFaction(other_player.getUniqueId());
+
+                    if (other_fuuid != null && !fuuid.equals(other_fuuid) && !allies.contains(other_fuuid)) {
+                        String name = MFDatabaseManager.getDatabase().getFactionName(other_fuuid);
+
+                        if (!tab.contains(name) && name.toLowerCase().startsWith(args[0].toLowerCase())) {
+                            tab.add(name);
+                        }
                     }
                 }
             } catch (SQLException e) {

@@ -1,7 +1,6 @@
 package com.modernfactions.listener;
 
 import com.modernfactions.MF;
-import com.modernfactions.MFTranslationManager;
 import com.modernfactions.data.MFDatabaseManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
@@ -14,7 +13,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.UUID;
 
 public class ChatListener implements Listener {
