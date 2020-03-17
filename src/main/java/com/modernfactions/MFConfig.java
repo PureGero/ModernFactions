@@ -29,6 +29,10 @@ public class MFConfig {
         return plugin.getConfig().getInt("factions.claim-price", 0);
     }
 
+    public String getWelcomeMessage() {
+        return plugin.getConfig().getString("factions.welcome-message", "");
+    }
+
     public String getMysqlHost() {
         return plugin.getConfig().getString("factions.mysql.host", "localhost");
     }

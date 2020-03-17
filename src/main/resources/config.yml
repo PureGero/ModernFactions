@@ -10,6 +10,10 @@ factions:
   # Set to 0 for infinite free claims
   claim-price: 0
 
+  # New player welcome message (leave blank for no message)
+  # %s will be replaced with the player's name
+  welcome-message: ''
+
   # MySQL database details
   mysql:
 
