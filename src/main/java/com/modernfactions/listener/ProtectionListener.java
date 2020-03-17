@@ -59,15 +59,17 @@ public class ProtectionListener implements Listener {
             try {
                 UUID fuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
 
-                if (claim_fuuid.equals(fuuid)) {
-                    return;
-                }
-
-                List<UUID> allies = MFDatabaseManager.getDatabase().getAddedMe(fuuid);
-
-                for (UUID ally : allies) {
-                    if (claim_fuuid.equals(ally)) {
+                if (fuuid != null) {
+                    if (claim_fuuid.equals(fuuid)) {
                         return;
+                    }
+
+                    List<UUID> allies = MFDatabaseManager.getDatabase().getAddedMe(fuuid);
+
+                    for (UUID ally : allies) {
+                        if (claim_fuuid.equals(ally)) {
+                            return;
+                        }
                     }
                 }
 

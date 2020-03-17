@@ -6,16 +6,17 @@ softdepend: [Vault]
 commands:
   testrandomteleport:
     description: Test the random teleport functionality
-    default: op
+    permission: modernfactions.testrandomteleport
   modernfactions:
     description: Modern Factions commands
-    default: true;
     aliases: [f, mf, factions]
   refer:
     description: Refer a player
-    default: true
     aliases: [referral]
   territory:
     description: A visual view of the claim around you
-    default: true
     aliases: [terr, claims]
+permissions:
+  moderfactions.testrandomteleport:
+    description: Access to the /testrandomteleport command
+    default: op

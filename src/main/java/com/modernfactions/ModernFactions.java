@@ -38,6 +38,7 @@ public final class ModernFactions extends JavaPlugin {
         new MFDatabaseManager(this);
         economy = new MFEconomyManager(this);
         claims = new MFClaimManager(this);
+        new MFTutorialManager(this);
 
     }
 

@@ -15,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +26,11 @@ public class TerritoryCommand implements CommandExecutor {
         Player player = (Player) sender;
         try {
             UUID fuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
-            List<UUID> allies = MFDatabaseManager.getDatabase().getAddedMe(fuuid);
+            List<UUID> allies = new ArrayList<UUID>();
+
+            if (fuuid != null) {
+                allies = MFDatabaseManager.getDatabase().getAddedMe(fuuid);
+            }
 
             for (int i = 0; i < 32; i++) {
                 TerritoryView view = new TerritoryView(player, i, fuuid, allies);
