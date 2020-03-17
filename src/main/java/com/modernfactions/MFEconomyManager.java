@@ -1,9 +1,12 @@
 package com.modernfactions;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,6 +26,39 @@ public class MFEconomyManager {
         }
     }
 
+    /**
+     * Returns the translation text for either singular, dual or plural number of coins
+     * E.g. 1 coin (singular)
+     *      2 coins (dual)
+     *      3,4,5... coins (plural)
+     * Note that there should never be 0 coins, it should say free instead
+     * @param sender The sender to use the locale of
+     * @param coins The number of coins (coins >= 1)
+     */
+    private BaseComponent[] getCoinsText(CommandSender sender, double coins) {
+        if (coins < 2) {
+            return MF.getMessage(sender, "economy.coins.singular", coins);
+        } else if (coins < 3) {
+            return MF.getMessage(sender, "economy.coins.dual", coins);
+        } else {
+            return MF.getMessage(sender, "economy.coins.plural", coins);
+        }
+    }
+
+    /**
+     * Returns the translation text, without any text component formatting,
+     * for either singular, dual or plural number of coins
+     * E.g. 1 coin (singular)
+     *      2 coins (dual)
+     *      3,4,5... coins (plural)
+     * Note that there should never be 0 coins, it should say free instead
+     * @param sender The sender to use the locale of
+     * @param coins The number of coins (coins >= 1)
+     */
+    private String getCoinsTextRaw(CommandSender sender, double coins) {
+        return TextComponent.toPlainText(getCoinsText(sender, coins));
+    }
+
     public void giveMoney(UUID player, double amount) {
         if (amount == 0) {
             return;
@@ -33,7 +69,7 @@ public class MFEconomyManager {
         Player onlinePlayer = plugin.getServer().getPlayer(player);
         if (onlinePlayer != null) {
             onlinePlayer.spigot().sendMessage(new ComponentBuilder()
-                    .append(MF.getMessage(onlinePlayer, "economy.add", amount))
+                    .append(MF.getMessage(onlinePlayer, "economy.add", getCoinsTextRaw(onlinePlayer, amount)))
                     .color(ChatColor.GOLD).create());
         }
     }
@@ -49,11 +85,13 @@ public class MFEconomyManager {
         if (onlinePlayer != null) {
             if (response.transactionSuccess()) {
                 onlinePlayer.spigot().sendMessage(new ComponentBuilder()
-                        .append(MF.getMessage(onlinePlayer, "economy.take", amount))
+                        .append(MF.getMessage(onlinePlayer, "economy.take", getCoinsTextRaw(onlinePlayer, amount)))
                         .color(ChatColor.GOLD).create());
             } else {
                 onlinePlayer.spigot().sendMessage(new ComponentBuilder()
-                        .append(MF.getMessage(onlinePlayer, "economy.notenough", amount, economy.getBalance(onlinePlayer)))
+                        .append(MF.getMessage(onlinePlayer, "economy.notenough",
+                                getCoinsTextRaw(onlinePlayer, amount),
+                                getCoinsTextRaw(onlinePlayer, economy.getBalance(onlinePlayer))))
                         .color(ChatColor.RED).create());
             }
         }
