@@ -36,6 +36,11 @@ public class ReferCommand implements CommandExecutor {
 
         UUID uuid = ((Player) sender).getUniqueId();
 
+        if (uuid.equals(target.getUniqueId())) {
+            MF.sendMessage(sender, ChatColor.RED, "command.refer.error.cantreferyourself");
+            return false;
+        }
+
         try {
             if (MFDatabaseManager.getDatabase().hasReferredAPlayer(uuid)) {
                 MF.sendMessage(sender, ChatColor.RED, "command.refer.error.alreadyreferred");
