@@ -19,6 +19,11 @@ public class MysqlDatabase implements IDatabase {
                     "fuuid CHAR(36) NOT NULL,\n" +
                     "role TINYINT NOT NULL DEFAULT 0\n" +
             ");\n" +
+            "CREATE TABLE IF NOT EXISTS faction_invites (\n" +
+                    "fuuid CHAR(36),\n" +
+                    "uuid CHAR(36),\n" +
+                    "PRIMARY KEY (fuuid, uuid)\n" +
+            ");\n" +
             "CREATE TABLE IF NOT EXISTS faction_claims (\n" +
                     "fuuid CHAR(36),\n" +
                     "wuuid CHAR(36),\n" +
@@ -144,9 +149,10 @@ public class MysqlDatabase implements IDatabase {
 
     @Override
     public void addFactionMember(UUID fuuid, UUID uuid) throws SQLException {
+        invitePlayer(fuuid, uuid); // Make sure they're in the invite list
         execute(
                 "INSERT INTO faction_members (fuuid, uuid) VALUES (?, ?)\n" +
-                        "ON DUPLICATE KEY UPDATE fuuid = ?",
+                        "ON DUPLICATE KEY UPDATE fuuid = ?, role = 0",
                 fuuid.toString(),
                 uuid.toString(),
                 fuuid.toString()
@@ -171,6 +177,7 @@ public class MysqlDatabase implements IDatabase {
 
     @Override
     public void setFactionMemberRole(UUID fuuid, UUID uuid, int role) throws SQLException {
+        invitePlayer(fuuid, uuid); // Make sure they're in the invite list
         execute(
                 "INSERT INTO faction_members (fuuid, uuid, role) VALUES (?, ?, ?)\n" +
                         "ON DUPLICATE KEY UPDATE fuuid = ?, role = ?",
@@ -198,17 +205,84 @@ public class MysqlDatabase implements IDatabase {
     }
 
     @Override
+    public void removeFactionMember(UUID fuuid, UUID uuid) throws SQLException {
+        execute(
+                "DELETE FROM faction_members WHERE fuuid = ? AND uuid = ?",
+                fuuid.toString(),
+                uuid.toString()
+        );
+    }
+
+    @Override
+    public boolean isInvitedTo(UUID fuuid, UUID uuid) throws SQLException {
+        ResultSet set = executeQuery(
+                "SELECT uuid FROM faction_invites WHERE fuuid = ? AND uuid = ?",
+                fuuid.toString(),
+                uuid.toString()
+        );
+
+        return set.next();
+    }
+
+    @Override
+    public void invitePlayer(UUID fuuid, UUID uuid) throws SQLException {
+        execute(
+                "INSERT IGNORE INTO faction_invites (fuuid, uuid) VALUES (?, ?)",
+                fuuid.toString(),
+                uuid.toString()
+        );
+    }
+
+    @Override
+    public void kickPlayer(UUID fuuid, UUID uuid) throws SQLException {
+        removeFactionMember(fuuid, uuid);
+        execute(
+                "DELETE FROM faction_invites WHERE fuuid = ? AND uuid = ?",
+                fuuid.toString(),
+                uuid.toString()
+        );
+    }
+
+    @Override
+    public List<UUID> getFactionInvites(UUID fuuid) throws SQLException {
+        List<UUID> invites = new ArrayList<>();
+
+        ResultSet set = executeQuery(
+                "SELECT uuid FROM faction_invites WHERE fuuid = ?",
+                fuuid.toString()
+        );
+
+        while (set.next()) {
+            invites.add(UUID.fromString(set.getString("uuid")));
+        }
+
+        return invites;
+    }
+
+    @Override
+    public List<String> getMyInvitesNames(UUID uuid) throws SQLException {
+        List<String> factionNames = new ArrayList<>();
+
+        ResultSet set = executeQuery(
+                "SELECT name FROM faction_names, faction_invites WHERE faction_names.fuuid = faction_invites.fuuid AND faction_invites.uuid = ?",
+                uuid.toString()
+        );
+
+        while (set.next()) {
+            factionNames.add(set.getString("name"));
+        }
+
+        return factionNames;
+    }
+
+    @Override
     public boolean hasReferredAPlayer(UUID uuid) throws SQLException {
         ResultSet set = executeQuery(
                 "SELECT other_uuid FROM faction_referrals WHERE uuid = ?",
                 uuid.toString()
         );
 
-        if (set.next()) {
-            return true;
-        } else {
-            return false;
-        }
+        return set.next();
     }
 
     @Override
@@ -316,11 +390,7 @@ public class MysqlDatabase implements IDatabase {
                 added_fuuid.toString()
         );
 
-        if (set.next()) {
-            return true;
-        } else {
-            return false;
-        }
+        return set.next();
     }
 
     @Override

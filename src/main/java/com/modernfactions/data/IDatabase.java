@@ -22,6 +22,21 @@ public interface IDatabase {
 
     String getFactionNameFromMember(UUID uuid) throws SQLException;
 
+    void removeFactionMember(UUID fuuid, UUID uuid) throws SQLException;
+
+    boolean isInvitedTo(UUID fuuid, UUID uuid) throws SQLException;
+
+    void invitePlayer(UUID fuuid, UUID uuid) throws SQLException;
+
+    /**
+     * Removes a player from both the invite list, and the member list
+     */
+    void kickPlayer(UUID fuuid, UUID uuid) throws SQLException;
+
+    List<UUID> getFactionInvites(UUID fuuid) throws SQLException;
+
+    List<String> getMyInvitesNames(UUID uuid) throws SQLException;
+
     boolean hasReferredAPlayer(UUID uuid) throws SQLException;
 
     void referAPlayer(UUID uuid, UUID to) throws SQLException;

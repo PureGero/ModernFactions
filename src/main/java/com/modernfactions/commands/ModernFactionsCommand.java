@@ -5,10 +5,7 @@ import com.modernfactions.data.BlockPos;
 import com.modernfactions.data.MFDatabaseManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,34 +23,37 @@ public class ModernFactionsCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length > 0) {
-            try {
-                Method method = getClass().getMethod(args[0].toLowerCase(), CommandSender.class, String.class, String[].class);
+        Bukkit.getScheduler().runTaskAsynchronously(ModernFactions.get(), () -> {
+            if (args.length > 0) {
+                try {
+                    Method method = getClass().getMethod(args[0].toLowerCase(), CommandSender.class, String.class, String[].class);
 
-                String[] newargs = new String[args.length - 1];
-                System.arraycopy(args, 1, newargs, 0, newargs.length);
+                    String[] newargs = new String[args.length - 1];
+                    System.arraycopy(args, 1, newargs, 0, newargs.length);
 
-                // long t = System.currentTimeMillis();
+                    // long t = System.currentTimeMillis();
 
-                method.invoke(this, sender, label, newargs);
+                    method.invoke(this, sender, label, newargs);
 
-                // t = (System.currentTimeMillis() - t);
+                    // t = (System.currentTimeMillis() - t);
 
-                // sender.sendMessage(String.format("Took %d ms to execute command", t));
+                    // sender.sendMessage(String.format("Took %d ms to execute command", t));
 
-                return true;
-            } catch (NoSuchMethodException e) {
-
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-                MF.sendMessage(sender, ChatColor.RED, "command.failed", e.getMessage());
-                return false;
+                    return;
+                } catch (NoSuchMethodException e) {
+                    // Ignore
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                    MF.sendMessage(sender, ChatColor.RED, "command.failed", e.getMessage());
+                    return;
+                }
             }
-        }
 
-        help(sender, label, args);
+            help(sender, label, args);
 
-        return false;
+        });
+
+        return true;
     }
 
     public void help(CommandSender sender, String label, String[] args) {
@@ -86,6 +86,26 @@ public class ModernFactionsCommand implements CommandExecutor {
         builder.append(MF.getMessage(sender, "command.sethome.usage", label)).color(ChatColor.AQUA);
         builder.append(": ");
         builder.append(MF.getMessage(sender, "command.sethome.description")).color(ChatColor.BLUE);
+        builder.append("\n");
+
+        builder.append(MF.getMessage(sender, "command.join.usage", label)).color(ChatColor.AQUA);
+        builder.append(": ");
+        builder.append(MF.getMessage(sender, "command.join.description")).color(ChatColor.BLUE);
+        builder.append("\n");
+
+        builder.append(MF.getMessage(sender, "command.leave.usage", label)).color(ChatColor.AQUA);
+        builder.append(": ");
+        builder.append(MF.getMessage(sender, "command.leave.description")).color(ChatColor.BLUE);
+        builder.append("\n");
+
+        builder.append(MF.getMessage(sender, "command.invite.usage", label)).color(ChatColor.AQUA);
+        builder.append(": ");
+        builder.append(MF.getMessage(sender, "command.invite.description")).color(ChatColor.BLUE);
+        builder.append("\n");
+
+        builder.append(MF.getMessage(sender, "command.kick.usage", label)).color(ChatColor.AQUA);
+        builder.append(": ");
+        builder.append(MF.getMessage(sender, "command.kick.description")).color(ChatColor.BLUE);
         builder.append("\n");
 
         builder.append(MF.getMessage(sender, "command.ally.usage", label)).color(ChatColor.AQUA);
@@ -124,6 +144,12 @@ public class ModernFactionsCommand implements CommandExecutor {
             try {
                 MFDatabaseManager.getDatabase().setFactionName(newFuuid, name);
                 if (name.equals(MFDatabaseManager.getDatabase().getFactionName(newFuuid))) {
+
+                    if (MFDatabaseManager.getDatabase().getFaction(uuid) != null) {
+                        // Leave their current faction
+                        leave(sender, label, args);
+                    }
+
                     MFDatabaseManager.getDatabase().setFactionMemberRole(newFuuid, uuid, Roles.OWNER);
                     MF.sendMessage(sender, ChatColor.GREEN, "command.create.success", name);
                 } else {
@@ -262,7 +288,11 @@ public class ModernFactionsCommand implements CommandExecutor {
                 block = block.getRelative(0, 1, 0);
             }
 
-            player.teleport(block.getLocation().add(0.5, 0 ,0.5));
+            Block tpTo = block;
+
+            Bukkit.getScheduler().runTask(ModernFactions.get(), () -> {
+                player.teleport(tpTo.getLocation().add(0.5, 0 ,0.5));
+            });
 
             if (args.length >= 1) {
                 MF.sendMessage(sender, ChatColor.GREEN, "command.home.success.otherfaction", name);
@@ -411,6 +441,182 @@ public class ModernFactionsCommand implements CommandExecutor {
                 if (alliedPlayer != null) {
                     MF.sendMessage(alliedPlayer, ChatColor.RED, "command.enemy.success.enemy", myname);
                     alliedPlayer.playSound(alliedPlayer.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 1, 1);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void invite(CommandSender sender, String label, String[] args) {
+        Player player = (Player) sender;
+
+        try {
+            if (args.length == 0) {
+                sender.spigot().sendMessage(new ComponentBuilder().append(
+                        MF.getMessage(sender, "commands.generic.usage",
+                                (Object) MF.getMessage(sender, "command.invite.usage", label))
+                ).color(ChatColor.RED).create());
+                return;
+            }
+
+            UUID fuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
+
+            if (fuuid == null) {
+                MF.sendMessage(sender, ChatColor.RED, "command.error.notinfaction");
+                return;
+            }
+
+            Player target = Bukkit.getPlayer(args[0]);
+
+            if (target == null) {
+                MF.sendMessage(sender, ChatColor.RED, "argument.entity.notfound.player");
+                return;
+            }
+
+            if (MFDatabaseManager.getDatabase().isInvitedTo(fuuid, target.getUniqueId())) {
+                MF.sendMessage(sender, ChatColor.RED, "command.invite.error.alreadyinvited", target.getName());
+                return;
+            }
+
+            String factionName = MFDatabaseManager.getDatabase().getFactionName(fuuid);
+
+            MFDatabaseManager.getDatabase().invitePlayer(fuuid, target.getUniqueId());
+
+            MF.sendMessage(sender, ChatColor.GREEN, "command.invite.success", target.getName());
+
+            MF.sendMessage(target, ChatColor.GOLD, "command.invite.success.other", factionName);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void kick(CommandSender sender, String label, String[] args) {
+        Player player = (Player) sender;
+
+        try {
+            if (args.length == 0) {
+                sender.spigot().sendMessage(new ComponentBuilder().append(
+                        MF.getMessage(sender, "commands.generic.usage",
+                                (Object) MF.getMessage(sender, "command.kick.usage", label))
+                ).color(ChatColor.RED).create());
+                return;
+            }
+
+            UUID fuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
+
+            if (fuuid == null) {
+                MF.sendMessage(sender, ChatColor.RED, "command.error.notinfaction");
+                return;
+            }
+
+            OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
+
+            if (!MFDatabaseManager.getDatabase().isInvitedTo(fuuid, target.getUniqueId())) {
+                MF.sendMessage(sender, ChatColor.RED, "command.kick.error.notinfaction", target.getName());
+                return;
+            }
+
+            UUID target_fuuid = MFDatabaseManager.getDatabase().getFaction(target.getUniqueId());
+
+            MFDatabaseManager.getDatabase().kickPlayer(fuuid, target.getUniqueId());
+
+            MF.sendMessage(sender, ChatColor.GREEN, "command.kick.success", target.getName());
+
+            if (fuuid.equals(target_fuuid)) { // Is also a member of the faction
+                String factionName = MFDatabaseManager.getDatabase().getFactionName(fuuid);
+
+                if (target.isOnline()) {
+                    MF.sendMessage(target.getPlayer(), ChatColor.GOLD, "command.kick.success.other", factionName);
+                }
+
+                for (UUID uuid : MFDatabaseManager.getDatabase().getFactionMembers(fuuid)) {
+                    Player member = Bukkit.getPlayer(uuid);
+                    if (member != null) {
+                        MF.sendMessage(member, ChatColor.GOLD, "command.kick.success.faction", player.getName(), target.getName());
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void join(CommandSender sender, String label, String[] args) {
+        Player player = (Player) sender;
+
+        try {
+            if (args.length == 0) {
+                sender.spigot().sendMessage(new ComponentBuilder().append(
+                        MF.getMessage(sender, "commands.generic.usage",
+                                (Object) MF.getMessage(sender, "command.join.usage", label))
+                ).color(ChatColor.RED).create());
+                return;
+            }
+
+            UUID fuuid = MFDatabaseManager.getDatabase().getFactionByName(args[0]);
+
+            if (fuuid == null) {
+                MF.sendMessage(sender, ChatColor.RED, "command.error.factionnotfound", args[0]);
+                return;
+            }
+
+            UUID currentFuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
+
+            if (fuuid.equals(currentFuuid)) {
+                MF.sendMessage(sender, ChatColor.RED, "command.join.error.alreadyinfaction");
+                return;
+            }
+
+            if (!MFDatabaseManager.getDatabase().isInvitedTo(fuuid, player.getUniqueId())/* &&
+                    MFDatabaseManager.getDatabase().getFactionMemberCount(fuuid) > 0*/) {
+                MF.sendMessage(sender, ChatColor.RED, "command.join.error.notinvited");
+                return;
+            }
+
+            if (currentFuuid != null) {
+                // Leave their current faction
+                leave(sender, label, args);
+            }
+
+            MFDatabaseManager.getDatabase().addFactionMember(fuuid, player.getUniqueId());
+
+            String factionName = MFDatabaseManager.getDatabase().getFactionName(fuuid);
+
+            MF.sendMessage(sender, ChatColor.GREEN, "command.join.success", factionName);
+
+            for (UUID uuid : MFDatabaseManager.getDatabase().getFactionMembers(fuuid)) {
+                Player member = Bukkit.getPlayer(uuid);
+                if (member != null) {
+                    MF.sendMessage(member, ChatColor.GOLD, "command.join.success.other", player.getName());
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void leave(CommandSender sender, String label, String[] args) {
+        Player player = (Player) sender;
+
+        try {
+            UUID fuuid = MFDatabaseManager.getDatabase().getFaction(player.getUniqueId());
+
+            if (fuuid == null) {
+                MF.sendMessage(sender, ChatColor.RED, "command.error.notinfaction");
+                return;
+            }
+
+            String factionName = MFDatabaseManager.getDatabase().getFactionName(fuuid);
+
+            MFDatabaseManager.getDatabase().removeFactionMember(fuuid, player.getUniqueId());
+
+            MF.sendMessage(sender, ChatColor.GREEN, "command.leave.success", factionName);
+
+            for (UUID uuid : MFDatabaseManager.getDatabase().getFactionMembers(fuuid)) {
+                Player member = Bukkit.getPlayer(uuid);
+                if (member != null) {
+                    MF.sendMessage(member, ChatColor.GOLD, "command.leave.success.other", player.getName());
                 }
             }
         } catch (SQLException e) {

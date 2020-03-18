@@ -2,6 +2,7 @@ package com.modernfactions.commands;
 
 import com.modernfactions.data.MFDatabaseManager;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -133,6 +134,86 @@ public class ModernFactionsTabCompleter implements TabCompleter {
                 for (String ally : allies) {
                     if (ally.toLowerCase().startsWith(args[0].toLowerCase())) {
                         tab.add(ally);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void invite(CommandSender sender, String alias, String[] args, List<String> tab) {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+
+        UUID uuid = ((Player) sender).getUniqueId();
+
+        if (args.length == 1) {
+            try {
+                UUID fuuid = MFDatabaseManager.getDatabase().getFaction(uuid);
+
+                if (fuuid == null) {
+                    return;
+                }
+
+                List<UUID> invites = MFDatabaseManager.getDatabase().getFactionInvites(fuuid);
+
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (!invites.contains(player.getUniqueId()) &&
+                            player.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
+                        tab.add(player.getName());
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void kick(CommandSender sender, String alias, String[] args, List<String> tab) {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+
+        UUID uuid = ((Player) sender).getUniqueId();
+
+        if (args.length == 1) {
+            try {
+                UUID fuuid = MFDatabaseManager.getDatabase().getFaction(uuid);
+
+                if (fuuid == null) {
+                    return;
+                }
+
+                List<UUID> invites = MFDatabaseManager.getDatabase().getFactionInvites(fuuid);
+
+                for (UUID invite : invites) {
+                    OfflinePlayer player = Bukkit.getOfflinePlayer(invite);
+                    if (player.getName() != null && player.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
+                        tab.add(player.getName());
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void join(CommandSender sender, String alias, String[] args, List<String> tab) {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+
+        UUID uuid = ((Player) sender).getUniqueId();
+
+        if (args.length == 1) {
+            try {
+                List<String> factions = MFDatabaseManager.getDatabase().getMyInvitesNames(uuid);
+
+                for (String faction : factions) {
+                    if (faction.toLowerCase().startsWith(args[0].toLowerCase())) {
+                        tab.add(faction);
                     }
                 }
             } catch (SQLException e) {
