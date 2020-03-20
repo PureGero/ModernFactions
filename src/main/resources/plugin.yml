@@ -20,3 +20,6 @@ permissions:
   moderfactions.testrandomteleport:
     description: Access to the /testrandomteleport command
     default: op
+  moderfactions.vip:
+    description: Whether a player should have a vip prefix
+    default: false
