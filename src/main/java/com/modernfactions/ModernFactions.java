@@ -3,6 +3,8 @@ package com.modernfactions;
 import com.modernfactions.commands.MFCommandManager;
 import com.modernfactions.data.MFDatabaseManager;
 import com.modernfactions.listener.MFListenerManager;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ModernFactions extends JavaPlugin {
@@ -40,6 +42,14 @@ public final class ModernFactions extends JavaPlugin {
         claims = new MFClaimManager(this);
         new MFTutorialManager(this);
 
+        disableKeepingSpawnInMemory();
+
+    }
+
+    private void disableKeepingSpawnInMemory() {
+        for (World world : Bukkit.getWorlds()) {
+            world.setKeepSpawnInMemory(false);
+        }
     }
 
     @Override
