@@ -46,10 +46,10 @@ public class ChatListener implements Listener {
         ComponentBuilder name = new ComponentBuilder();
 
         if (sender.hasPermission("modernfactions.vip")) {
-            name.append("VIP").color(ChatColor.GOLD).bold(true)
+            name.append(MF.getMessage(receiver, "vip")).color(ChatColor.GOLD).bold(true)
                 .event(new HoverEvent(
                         HoverEvent.Action.SHOW_TEXT,
-                        new ComponentBuilder("Become a VIP with /donate").color(ChatColor.GOLD).create()
+                        new ComponentBuilder().append(MF.getMessage(receiver, "vip.advertise")).color(ChatColor.GOLD).create()
                 ));
             name.append(" ");
             name.reset();
@@ -98,8 +98,8 @@ public class ChatListener implements Listener {
             name.append(prefixComponent)
                 .event(new HoverEvent(
                         HoverEvent.Action.SHOW_TEXT,
-                        new ComponentBuilder("Rank: ").append(TextComponent.toPlainText(prefixComponent))
-                                .append("\nView all ranks with /ranks").create()
+                        new ComponentBuilder().append(MF.getMessage(receiver, "rank.name", TextComponent.toPlainText(prefixComponent)))
+                                .append("\n").append(MF.getMessage(receiver, "rank.viewall")).create()
                 ));
             name.append(" ");
         }

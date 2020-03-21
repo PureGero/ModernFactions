@@ -1,5 +1,6 @@
 package com.modernfactions;
 
+import com.modernfactions.util.UpsidedownTextUtil;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.TranslatableComponent;
@@ -7,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.xml.soap.Text;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -104,7 +106,11 @@ public class MFTranslationManager {
     }
 
     private BaseComponent[] getMessage(String languageName, String name, Object[] args) {
-        if (translations.containsKey(languageName)) {
+        if (languageName.equals("en_ud") && english.get(name) != null) {
+            return TextComponent.fromLegacyText(
+                    UpsidedownTextUtil.makeUpsideDown(
+                            TextComponent.toPlainText(getMessage(english, name, args))));
+        } else if (translations.containsKey(languageName)) {
             return getMessage(translations.get(languageName), name, args);
         } else {
             return getMessage(english, name, args);
