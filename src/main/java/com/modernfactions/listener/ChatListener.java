@@ -2,6 +2,8 @@ package com.modernfactions.listener;
 
 import com.modernfactions.MF;
 import com.modernfactions.data.MFDatabaseManager;
+import com.modernfactions.util.CountryUtil;
+import com.modernfactions.util.LanguageUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import net.milkbowl.vault.chat.Chat;
@@ -103,7 +105,13 @@ public class ChatListener implements Listener {
         }
 
         TextComponent playerName = new TextComponent(sender.getDisplayName());
-        playerName.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ENTITY, new ComponentBuilder("{id:" + sender.getUniqueId() + ",type:minecraft:player,name:" + sender.getName() + "}").create()));
+        //playerName.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ENTITY, new ComponentBuilder("{id:" + sender.getUniqueId() + ",type:minecraft:player,name:" + sender.getName() + "}").create()));
+        playerName.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                new ComponentBuilder()
+                        .append(sender.getName()).append("\n")
+                        .append(LanguageUtil.getLanguageName(sender.getLocale())).append("\n")
+                        .append(CountryUtil.getCountry(sender.getAddress().getAddress().getHostAddress()))
+                        .create()));
         name.append(playerName);
 
         String suffix = vaultChat.getPlayerSuffix(sender);
