@@ -68,9 +68,7 @@ public class MFEconomyManager {
 
         Player onlinePlayer = plugin.getServer().getPlayer(player);
         if (onlinePlayer != null) {
-            onlinePlayer.spigot().sendMessage(new ComponentBuilder()
-                    .append(MF.getMessage(onlinePlayer, "economy.add", getCoinsTextRaw(onlinePlayer, amount)))
-                    .color(ChatColor.GOLD).create());
+            MF.sendMessage(onlinePlayer, ChatColor.GOLD, "economy.add", getCoinsTextRaw(onlinePlayer, amount));
         }
     }
 
@@ -84,15 +82,11 @@ public class MFEconomyManager {
         Player onlinePlayer = plugin.getServer().getPlayer(player);
         if (onlinePlayer != null) {
             if (response.transactionSuccess()) {
-                onlinePlayer.spigot().sendMessage(new ComponentBuilder()
-                        .append(MF.getMessage(onlinePlayer, "economy.take", getCoinsTextRaw(onlinePlayer, amount)))
-                        .color(ChatColor.GOLD).create());
+                MF.sendMessage(onlinePlayer, ChatColor.GOLD, "economy.take", getCoinsTextRaw(onlinePlayer, amount));
             } else {
-                onlinePlayer.spigot().sendMessage(new ComponentBuilder()
-                        .append(MF.getMessage(onlinePlayer, "economy.notenough",
-                                getCoinsTextRaw(onlinePlayer, amount),
-                                getCoinsTextRaw(onlinePlayer, economy.getBalance(onlinePlayer))))
-                        .color(ChatColor.RED).create());
+                MF.sendMessage(onlinePlayer, ChatColor.RED, "economy.notenough",
+                        getCoinsTextRaw(onlinePlayer, amount),
+                        getCoinsTextRaw(onlinePlayer, economy.getBalance(onlinePlayer)));
             }
         }
 

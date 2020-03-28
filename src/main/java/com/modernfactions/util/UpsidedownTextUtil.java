@@ -5,8 +5,8 @@ public class UpsidedownTextUtil {
     public static String makeUpsideDown(String text) {
         // From https://stackoverflow.com/questions/24371977/how-to-flip-a-letter-upside-down
 
-        String normal = "abcdefghijklmnopqrstuvwxyz_,;.?!/\\'";
-        String split  = "ɐqɔpǝɟbɥıظʞןɯuodbɹsʇnʌʍxʎz‾'؛˙¿¡/\\,";
+        String normal = "abcdefghijklmnopqrstuvwxyz_,;.?!/\\'<>";
+        String split  = "ɐqɔpǝɟbɥıظʞןɯuodbɹsʇnʌʍxʎz‾'؛˙¿¡/\\,><";
         //maj
         normal += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         split  += "∀qϽᗡƎℲƃHIſʞ˥WNOԀὉᴚS⊥∩ΛMXʎZ";

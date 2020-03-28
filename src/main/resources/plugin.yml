@@ -16,6 +16,9 @@ commands:
   territory:
     description: A visual view of the claim around you
     aliases: [terr, claims]
+  modernfactionsadmin:
+    description: Modern Factions admin command
+    aliases: [mfadmin, mfa, fa, fadmin]
 permissions:
   moderfactions.testrandomteleport:
     description: Access to the /testrandomteleport command
@@ -23,3 +26,6 @@ permissions:
   moderfactions.vip:
     description: Whether a player should have a vip prefix
     default: false
+  moderfactions.admin:
+    description: Modern Factions admin command
+    default: op

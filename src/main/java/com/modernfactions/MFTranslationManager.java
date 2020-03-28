@@ -106,7 +106,7 @@ public class MFTranslationManager {
     }
 
     private BaseComponent[] getMessage(String languageName, String name, Object[] args) {
-        if (languageName.equals("en_ud") && english.get(name) != null) {
+        if (languageName != null && languageName.equals("en_ud") && english.get(name) != null) {
             return TextComponent.fromLegacyText(
                     UpsidedownTextUtil.makeUpsideDown(
                             TextComponent.toPlainText(getMessage(english, name, args))));

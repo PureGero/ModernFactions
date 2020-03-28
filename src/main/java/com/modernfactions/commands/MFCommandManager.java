@@ -17,12 +17,14 @@ public class MFCommandManager {
     private void registerCommands() {
         plugin.getServer().getPluginCommand("testrandomteleport").setExecutor(new TestRandomTeleport());
         plugin.getServer().getPluginCommand("modernfactions").setExecutor(new ModernFactionsCommand());
+        plugin.getServer().getPluginCommand("modernfactionsadmin").setExecutor(new ModernFactionsAdminCommand());
         plugin.getServer().getPluginCommand("refer").setExecutor(new ReferCommand());
         plugin.getServer().getPluginCommand("territory").setExecutor(new TerritoryCommand());
     }
 
     private void registerTabCompleters() {
         plugin.getServer().getPluginCommand("modernfactions").setTabCompleter(new ModernFactionsTabCompleter());
+        plugin.getServer().getPluginCommand("modernfactionsadmin").setTabCompleter(new ModernFactionsAdminTabCompleter());
     }
 
 }
