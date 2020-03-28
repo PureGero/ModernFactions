@@ -125,6 +125,12 @@ public class ChatListener implements Listener {
     }
 
     private BaseComponent formatMessage(Player sender, Player receiver, String message) {
+
+        // Coloured chat
+        if (sender.hasPermission("modernfactions.vip")) {
+            message = ChatColor.translateAlternateColorCodes('&', message);
+        }
+
         return new TextComponent(TextComponent.fromLegacyText(message));
     }
 }
