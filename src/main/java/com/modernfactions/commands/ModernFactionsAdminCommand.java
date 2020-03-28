@@ -81,7 +81,7 @@ public class ModernFactionsAdminCommand implements CommandExecutor {
 
         MF.sendMessage(target, ChatColor.GREEN, "purchase.coins.thankyou", args[1]);
 
-        if (sender.hasPermission("modernfactions.vip")) {
+        if (target.hasPermission("modernfactions.vip")) {
             MF.sendMessage(target, ChatColor.GREEN, "purchase.coins.vip");
             amount *= 2;
         }

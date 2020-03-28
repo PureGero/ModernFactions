@@ -19,6 +19,12 @@ commands:
   modernfactionsadmin:
     description: Modern Factions admin command
     aliases: [mfadmin, mfa, fa, fadmin]
+  discord:
+    description: Get the Discord link
+    aliases: [slack, chatroom]
+  store:
+    description: Get the store link
+    aliases: [buycraft, donate, donation]
 permissions:
   moderfactions.testrandomteleport:
     description: Access to the /testrandomteleport command

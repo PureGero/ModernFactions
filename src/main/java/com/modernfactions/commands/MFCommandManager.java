@@ -20,6 +20,8 @@ public class MFCommandManager {
         plugin.getServer().getPluginCommand("modernfactionsadmin").setExecutor(new ModernFactionsAdminCommand());
         plugin.getServer().getPluginCommand("refer").setExecutor(new ReferCommand());
         plugin.getServer().getPluginCommand("territory").setExecutor(new TerritoryCommand());
+        plugin.getServer().getPluginCommand("discord").setExecutor(new DiscordCommand());
+        plugin.getServer().getPluginCommand("store").setExecutor(new StoreCommand());
     }
 
     private void registerTabCompleters() {
