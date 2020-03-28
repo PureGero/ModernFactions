@@ -14,7 +14,7 @@ public class CountryUtil {
         }
 
         try {
-            URL url = new URL("http://ip-api.com/csv/220.239.2.52");
+            URL url = new URL("http://ip-api.com/csv/" + ip);
             InputStream in = url.openStream();
             byte[] b = new byte[4096];
             int l = in.read(b);
