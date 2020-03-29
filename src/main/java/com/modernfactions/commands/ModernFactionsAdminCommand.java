@@ -6,6 +6,7 @@ import com.modernfactions.ModernFactions;
 import com.modernfactions.Roles;
 import com.modernfactions.data.BlockPos;
 import com.modernfactions.data.MFDatabaseManager;
+import com.modernfactions.listener.TemporaryMotdListener;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.milkbowl.vault.economy.Economy;
@@ -89,5 +90,21 @@ public class ModernFactionsAdminCommand implements CommandExecutor {
         ModernFactions.getEconomy().giveMoney(target.getUniqueId(), amount);
 
         sender.sendMessage("Gave " + target.getName() + " " + amount + " coins");
+    }
+
+    public void motd(CommandSender sender, String label, String[] args) {
+        if (args.length < 1) {
+            TemporaryMotdListener.clearMotd();
+
+            sender.sendMessage("Cleared motd");
+
+            return;
+        }
+
+        String motd = String.join(" ", args);
+
+        TemporaryMotdListener.setMotd(motd);
+
+        sender.sendMessage("Set motd to " + motd);
     }
 }

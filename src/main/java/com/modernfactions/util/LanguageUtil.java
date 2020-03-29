@@ -82,6 +82,7 @@ public class LanguageUtil {
         languages.put("lb_lu","Luxembourgish");
         languages.put("li_li","Limburgish");
         languages.put("lol_aa","LOLCAT");
+        languages.put("lol_us","LOLCAT");
         languages.put("lt_lt","Lithuanian");
         languages.put("lv_lv","Latvian");
         languages.put("mi_nz","Māori");
@@ -137,7 +138,7 @@ public class LanguageUtil {
         if (languageCode == null) {
             return "English";
         } else {
-            return languages.get(languageCode);
+            return languages.getOrDefault(languageCode, languageCode);
         }
     }
 }

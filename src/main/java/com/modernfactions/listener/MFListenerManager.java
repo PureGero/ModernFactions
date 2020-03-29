@@ -17,5 +17,6 @@ public class MFListenerManager {
         plugin.getServer().getPluginManager().registerEvents(new ChatListener(), plugin);
         plugin.getServer().getPluginManager().registerEvents(new ProtectionListener(), plugin);
         plugin.getServer().getPluginManager().registerEvents(new FirstJoinListener(), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new TemporaryMotdListener(), plugin);
     }
 }

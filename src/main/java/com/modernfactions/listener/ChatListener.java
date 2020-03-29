@@ -6,6 +6,7 @@ import com.modernfactions.util.CountryUtil;
 import com.modernfactions.util.LanguageUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.milkbowl.vault.chat.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -31,6 +32,14 @@ public class ChatListener implements Listener {
 
             chat.addWith(formatName(e.getPlayer(), player));
             chat.addWith(formatMessage(e.getPlayer(), player, e.getMessage()));
+
+            String json = ComponentSerializer.toString(chat);
+
+            if (json.contains("{}")) {
+                System.out.println(json);
+                player.sendMessage("<" + e.getPlayer().getName() + "> " + e.getMessage());
+                continue;
+            }
 
             player.spigot().sendMessage(chat);
 
