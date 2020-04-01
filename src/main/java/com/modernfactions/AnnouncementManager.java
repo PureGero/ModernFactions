@@ -22,7 +22,8 @@ public class AnnouncementManager implements Runnable {
             "Vote for us with /vote to earn some coins",
             "Refer a friend with /refer to get some coins",
             "Buy stuff from the in-game shop at /shop, and sell stuff with /sell",
-            "Check out the online store at /store"
+            "Check out the online store at /store",
+            "See the ranks with /ranks, and rankup to the next rank with /rankup",
     };
 
     private String lastMessage = null;
