@@ -41,6 +41,7 @@ public final class ModernFactions extends JavaPlugin {
         economy = new MFEconomyManager(this);
         claims = new MFClaimManager(this);
         new MFTutorialManager(this);
+        new AnnouncementManager(this);
 
         disableKeepingSpawnInMemory();
 

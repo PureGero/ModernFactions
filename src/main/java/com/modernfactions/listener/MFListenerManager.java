@@ -18,5 +18,19 @@ public class MFListenerManager {
         plugin.getServer().getPluginManager().registerEvents(new ProtectionListener(), plugin);
         plugin.getServer().getPluginManager().registerEvents(new FirstJoinListener(), plugin);
         plugin.getServer().getPluginManager().registerEvents(new TemporaryMotdListener(), plugin);
+
+        registerVotifierListener();
+    }
+
+    private void registerVotifierListener() {
+        try {
+            if (Class.forName("com.vexsoftware.votifier.model.VotifierEvent") != null) {
+                plugin.getServer().getPluginManager().registerEvents(new VotifierListener(), plugin);
+                return;
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        plugin.getLogger().info("Votifier is not installed, votes have been disabled");
     }
 }

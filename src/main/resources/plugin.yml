@@ -2,7 +2,7 @@ name: ModernFactions
 main: com.modernfactions.ModernFactions
 version: 0.0.1
 api-version: 1.15
-softdepend: [Vault]
+softdepend: [Vault, Votifier]
 commands:
   testrandomteleport:
     description: Test the random teleport functionality
@@ -25,6 +25,8 @@ commands:
   store:
     description: Get the store link
     aliases: [buycraft, donate, donation]
+  vote:
+    description: Get a list of links to vote for the server
 permissions:
   moderfactions.testrandomteleport:
     description: Access to the /testrandomteleport command

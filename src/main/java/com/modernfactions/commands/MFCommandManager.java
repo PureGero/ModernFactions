@@ -22,6 +22,7 @@ public class MFCommandManager {
         plugin.getServer().getPluginCommand("territory").setExecutor(new TerritoryCommand());
         plugin.getServer().getPluginCommand("discord").setExecutor(new DiscordCommand());
         plugin.getServer().getPluginCommand("store").setExecutor(new StoreCommand());
+        plugin.getServer().getPluginCommand("vote").setExecutor(new VoteCommand());
     }
 
     private void registerTabCompleters() {
