@@ -24,6 +24,7 @@ public class AnnouncementManager implements Runnable {
             "Buy stuff from the in-game shop at /shop, and sell stuff with /sell",
             "Check out the online store at /store",
             "See the ranks with /ranks, and rankup to the next rank with /rankup",
+            "View your faction's territory with /terr, and claim more territory with /f claim",
     };
 
     private String lastMessage = null;
