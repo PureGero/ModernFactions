@@ -1,6 +1,8 @@
 package com.modernfactions;
 
 import org.bukkit.*;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Randomly teleport a player to somewhere in the world
@@ -39,4 +41,11 @@ public class RandomTeleport {
         }
     }
 
+    public static void giveKit(Player player) {
+        player.getInventory().addItem(new ItemStack(Material.STONE_SWORD));
+        player.getInventory().addItem(new ItemStack(Material.STONE_PICKAXE));
+        player.getInventory().addItem(new ItemStack(Material.STONE_SHOVEL));
+        player.getInventory().addItem(new ItemStack(Material.STONE_AXE));
+        player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 8));
+    }
 }

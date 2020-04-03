@@ -20,6 +20,8 @@ public class RandomTeleportListener implements Listener {
 
             player.teleport(RandomTeleport.getRandomTeleportLocation());
 
+            RandomTeleport.giveKit(e.getPlayer());
+
         }
     }
 
@@ -28,6 +30,8 @@ public class RandomTeleportListener implements Listener {
         if (!e.isBedSpawn()) {
 
             e.setRespawnLocation(RandomTeleport.getRandomTeleportLocation());
+
+            RandomTeleport.giveKit(e.getPlayer());
 
         }
     }
